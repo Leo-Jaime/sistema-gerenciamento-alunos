@@ -23,7 +23,7 @@ async function dbConnector(fastify, options) {
 
     fastify.log.info('Banco conectado e modelos sincronizados.');
   } catch (error) {
-    fastify.log.error('Erro na conexão:', error);
+    console.error('Erro detalhado na conexão com o banco:', error);
     process.exit(1);
   }
 }
