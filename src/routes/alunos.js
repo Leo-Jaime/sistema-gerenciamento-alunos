@@ -1,11 +1,15 @@
 export default async function (fastify, opts) {
     const { Aluno } = fastify.models;
   
-    
     fastify.post('/alunos', async (request, reply) => {
       try {
-        const { nome, curso, dias_semana, horario, data_nascimento, telefone  } = request.body;
-        const novoAluno = await Aluno.create({ nome, curso, dias_semana, horario, data_nascimento, telefone  });
+        const novoAlunoData = {
+          ...request.body,  
+          status: request.body.status || 'ativo'  
+        };
+ 
+        const novoAluno = await Aluno.create(novoAlunoData);
+  
         reply.code(201).send(novoAluno);
       } catch (err) {
         reply.code(500).send({ error: 'Erro ao criar aluno', detalhes: err.message });
@@ -38,7 +42,7 @@ export default async function (fastify, opts) {
       }
     });
   
-    // Deletar aluno
+   
     fastify.delete('/alunos/:id', async (request, reply) => {
       try {
         const { id } = request.params;
