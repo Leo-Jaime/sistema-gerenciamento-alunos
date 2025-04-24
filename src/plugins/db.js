@@ -1,7 +1,7 @@
-// src/plugins/db.js
 import fastifyPlugin from 'fastify-plugin';
 import { Sequelize } from 'sequelize';
 import AlunoModel from '../models/aluno.js';
+import FrequenciaModel from '../models/frequencia.js';
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
@@ -14,12 +14,18 @@ async function dbConnector(fastify, options) {
     await sequelize.authenticate();
 
     const Aluno = AlunoModel(sequelize);
+    const Frequencia = FrequenciaModel(sequelize);
+
+    // --- ASSOCIAÇÕES ---
+    Aluno.hasMany(Frequencia, { foreignKey: 'aluno_id' });
+    Frequencia.belongsTo(Aluno, { foreignKey: 'aluno_id' });
+
     await sequelize.sync({ alter: true });
 
     // Decorando com Sequelize e o operador Op
     fastify.decorate('sequelize', sequelize);
-    fastify.decorate('models', { Aluno });
-    fastify.decorate('Op', Sequelize.Op);  // Decorando o Op
+    fastify.decorate('models', { Aluno, Frequencia });
+    fastify.decorate('Op', Sequelize.Op);
 
     fastify.log.info('Banco conectado e modelos sincronizados.');
   } catch (error) {
